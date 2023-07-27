@@ -1,0 +1,48 @@
+
+plugins {
+    id 'scala'
+    id 'idea'
+    id 'application'
+}
+
+
+application {
+    mainClass.set('minesweeper.game.MineSweeperGame')
+}
+
+ext {
+    scalaMajorVersion = '2.13'
+    scalaVersion = '2.13.3'
+}
+
+
+repositories {
+    flatDir {
+        dirs 'lib'
+    }
+
+    mavenCentral()
+}
+
+sourceSets.main.scala.srcDirs = ['src']
+
+dependencies {
+    implementation "org.scala-lang:scala-library:${scalaVersion}"
+    implementation fileTree(include: ['*.jar'], dir: 'lib')
+}
+
+
+task zip(type: Zip) {
+    group = "prepareZipForSubmit"
+    description = "Zip your code for submission to Codegrade"
+
+    // To make sure you can always run this task
+    outputs.upToDateWhen { false }
+    dependsOn assemble
+
+    from fileTree(dir: '.')
+    include 'src/minesweeper/logic/**.scala'
+
+    archiveFileName = 'minesweeper.zip'
+    destinationDirectory = layout.buildDirectory.dir("$projectDir")
+}
