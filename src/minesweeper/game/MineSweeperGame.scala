@@ -119,7 +119,7 @@ class MineSweeperGame extends GameBase {
       }
     }
     else if(mouseButton == RIGHT) {
-      gameLogic.placeOrRemoveFlag(tileX, tileY)
+      gameLogic.flag(tileX, tileY)
     }
     redraw()
   }
@@ -155,19 +155,19 @@ class MineSweeperGame extends GameBase {
   }
 
   private def drawSmiley(): Unit = {
-    if (gameLogic.gameState.gameOver) {
-      image(smileys(1), (widthInPixels / 2 - GRID_BUFFER).toFloat, GRID_BUFFER.toFloat)
+    val index = gameLogic match {
+      case state if state.gameState.gameOver => 1
+      case state if state.gameWon => 2
+      case _ => 0
     }
-    else if (gameLogic.gameWon) {
-      image(smileys(2), (widthInPixels / 2 - GRID_BUFFER).toFloat, GRID_BUFFER.toFloat)
-    }
-    else {
-      image(smileys(0), (widthInPixels / 2 - GRID_BUFFER).toFloat, GRID_BUFFER.toFloat)
-    }
+
+    image(smileys(index), (widthInPixels / 2 - GRID_BUFFER).toFloat, GRID_BUFFER.toFloat)
   }
 
   private def drawTiles(): Unit = {
-    for (i <- 0 until gridDims.width - 1; j <- MineSweeperLogic.NrTopInvisibleLines - 1 until gridDims.height - 1) {
+    for (i <- 0 until gridDims.width - 1;
+         j <- MineSweeperLogic.NrTopInvisibleLines - 1 until gridDims.height - 1) {
+
       val tile = gameLogic.getTileType(i, j - MineSweeperLogic.NrTopInvisibleLines + 1)
       val pixelRow = getPixelCoord(i).toFloat
       val pixelCol = getPixelCoord(j).toFloat

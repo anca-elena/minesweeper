@@ -56,7 +56,7 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Boolea
     GameState(gameBoard, gameOver = false)
   }
 
-  def placeOrRemoveFlag(x: Int, y: Int) : GameState = {
+  def flagTile(x: Int, y: Int) : GameState = {
     if(withinBounds(x, y) && isCovered(x, y) && !isStart(x, y)) {
       val newBoard = gameBoard
       val tileType = gameBoard(x)(y)._1
@@ -73,38 +73,37 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Boolea
     GameState(gameBoard, gameOver = false)
   }
 
-  private def revealAllBombs(board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]]): Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]] = {
-    for (x <- board.indices; y <- board(0).indices) {
-      val tileType = board(x)(y)._1
-      if (tileType == Bomb && !hasFlag(x, y)) {
-        board(x)(y) = (Bomb, !IS_COVERED, !HAS_FLAG, !IS_START, 0)
-      }
-      else if(tileType != Bomb && hasFlag(x, y)) {
-        board(x)(y) = (WrongFlag, !IS_COVERED, !HAS_FLAG, !IS_START, 0)
-      }
-    }
-    board
+  private def revealAllBombs(board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]])
+                             : Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]] = {
+    board.indices.map{ x=>
+      board(0).indices.map{ y =>
+        val tileType = board(x)(y)._1
+        if (tileType == Bomb && !hasFlag(x, y))
+          (Bomb, !IS_COVERED, !HAS_FLAG, !IS_START, 0)
+        else if(tileType != Bomb && hasFlag(x, y))
+          (WrongFlag, !IS_COVERED, !HAS_FLAG, !IS_START, 0)
+        else
+          board(x)(y)
+      }.toArray
+    }.toArray
   }
 
   private def countFlags(x: Int, y: Int) : Int = {
-    var count = 0
-    for(i <- -1 to 1; j <- -1 to 1) {
-      if(withinBounds(x + i, y + j) && hasFlag(x + i, y + j)) {
-        count += 1
-      }
+    (-1 to 1).flatMap(dx =>
+      (-1 to 1).map(dy =>
+        (x + dx, y + dy))).count {
+      case (neighborX, neighborY) =>
+        withinBounds(neighborX, neighborY) && hasFlag(neighborX, neighborY)
     }
-    count
   }
 
   private def allBombsHaveFlags(x: Int, y: Int, board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]]): Boolean = {
-    for (neighborX <- -1 to 1; neighborY <- -1 to 1) {
-      if (withinBounds(x + neighborX, y + neighborY)) {
-        if (board(x + neighborX)(y + neighborY)._1 == Bomb && !hasFlag(x + neighborX, y + neighborY)) {
-          return false
-        }
-      }
+    (-1 to 1).flatMap(dx =>
+      (-1 to 1).map(dy =>
+        (x + dx, y + dy))).forall {
+      case (neighborX, neighborY) =>
+        withinBounds(neighborX, neighborY) && (board(neighborX)(neighborY)._1 != Bomb || hasFlag(neighborX, neighborY))
     }
-    true
   }
 
   private def isCovered(x: Int, y: Int) : Boolean = {

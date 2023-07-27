@@ -13,19 +13,10 @@ class MineSweeperLogic(val gridDims: Dimensions,
     val NUM_BOMBS: Int = MineSweeperLogic.NUM_BOMBS
 
     def gameWon : Boolean = {
-      var countDiscovered = 0
-      gameState.gameBoard.foreach(line => line.foreach
-        (tile =>
-          if(!tileIsCovered(tile)) {
-            countDiscovered += 1
-          }
-        )
-      )
+      val countDiscovered = gameState.gameBoard.flatten.count(tile => !tileIsCovered(tile))
 
-      if(countDiscovered == WIDTH * HEIGHT - NUM_BOMBS) {
-        return true
-      }
-      false
+      if(countDiscovered == WIDTH * HEIGHT - NUM_BOMBS) true
+      else false
     }
 
     def gameOver : Boolean = {
@@ -56,9 +47,9 @@ class MineSweeperLogic(val gridDims: Dimensions,
     }
   }
 
-  def placeOrRemoveFlag(x: Int, y: Int) : Unit = {
+  def flag(x: Int, y: Int) : Unit = {
     if(!gameOver && !gameWon) {
-      gameState = gameState.placeOrRemoveFlag(x, y)
+      gameState = gameState.flagTile(x, y)
     }
   }
 
@@ -96,15 +87,15 @@ object MineSweeperLogic {
   def apply() = new MineSweeperLogic(DefaultDims, createBoard(DefaultDims))
 
   def initBoard(gridDims: Dimensions): Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]]  = {
-    val board = Array.ofDim[(TileType, Boolean, Boolean, Boolean, Int)](gridDims.width, gridDims.height)
-    for (x <- 0 until gridDims.width; y <- 0 until gridDims.height) {
-      board(x)(y) = (DiscoveredTile, IS_COVERED, !HAS_FLAG, !IS_START, INIT_COUNT)
-    }
-    board
+    Array.fill(gridDims.width, gridDims.height)(DiscoveredTile, IS_COVERED, !HAS_FLAG, !IS_START, INIT_COUNT)
   }
 
-  def addBombs(board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]], gridDims: Dimensions): Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]] = {
+  //TODO: add bombs after the player clicked a tile, so that they never click on a bomb first try
+  def addBombs(board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]], gridDims: Dimensions)
+               : Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]] = {
+
     val newBoard = board
+    //TODO: refactor this to have randomX and randomY be a list of random distinct integers within the bounds
     var randomX = Random.nextInt(gridDims.width - 1)
     var randomY = Random.nextInt(gridDims.width)
     for (i <- 0 until NUM_BOMBS + 1) {
@@ -116,23 +107,29 @@ object MineSweeperLogic {
         newBoard(randomX)(randomY) = (Bomb, IS_COVERED, !HAS_FLAG, !IS_START, INIT_COUNT)
       }
     }
-    // Instead of placing one more bomb, initialize the safe tile X
+
     newBoard(randomX)(randomY) = (DiscoveredTile, IS_COVERED, !HAS_FLAG, IS_START, INIT_COUNT)
     newBoard
   }
 
-  def initNumberTiles(board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]]) : Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]] = {
-    val newBoard = board
-    for (x <- board.indices; y <- board.indices) {
-      if (newBoard(x)(y)._1 != Bomb) {
-        val bombCount = countBombs(x, y, newBoard)
-        if (bombCount > 0) {
-          newBoard(x)(y) = (NumberTile, IS_COVERED, !HAS_FLAG, newBoard(x)(y)._4, bombCount)
+  def initNumberTiles(board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]])
+                      : Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]] = {
+
+    board.indices.map( x =>
+      board(x).indices.map( y=>
+        if(board(x)(y)._1 != Bomb) {
+          if(countBombs(x, y, board) > 0)
+            (NumberTile, IS_COVERED, !HAS_FLAG, board(x)(y)._4, countBombs(x, y, board))
+          else
+            board(x)(y)
         }
-      }
-    }
-    newBoard
-  }
+        else {
+          board(x)(y)
+        }
+      ).toArray
+    ).toArray
+}
+
 
   def createBoard(gridDims: Dimensions) : GameState = {
     var board = initBoard(gridDims)
@@ -147,12 +144,11 @@ object MineSweeperLogic {
       x >= 0 && y >= 0 && x < board.length - 1 && y < board.length
     }
 
-    var bombCounter = 0
-    for (neighborX <- -1 to 1; neighborY <- -1 to 1) {
-      if (withinBounds(x + neighborX, y + neighborY) && board(x + neighborX)(y + neighborY)._1 == Bomb) {
-        bombCounter += 1
-      }
-    }
-    bombCounter
+    (-1 to 1).flatMap(dx =>
+      (-1 to 1).map(dy =>
+        (x + dx, y + dy))).count {
+          case(neighborX, neighborY) =>
+            withinBounds(neighborX, neighborY) && board(neighborX)(neighborY)._1 == Bomb
+        }
   }
 }
