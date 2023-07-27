@@ -20,12 +20,11 @@ the same, clicking it will auto-reveal all the un-flagged tiles (and possibly ma
 ### Basic functionality:
 
 When running the game you will encounter a 19 by 20 grid with a tile marked with an X.
-You're free to start with any tile, but the X tile is guaranteed not to be a bomb (to remove some of the guesswork).
+You're free to start with any tile, but the tile marked with X is guaranteed to result in the biggest cleared area.
 The top left corner shows the number of bombs you have left (can go into the negatives if you place
-more flags than there are bombs! It won't make you lose or anything, just letting you know that's normal).
+more flags than there are bombs!).
 The top right corner shows how much time you've spent on a game (up to 999 seconds).
 You win when you uncovered every non-bomb tile. You lose if you reveal a bomb.
-
 
 Lastly, a screenshot from the game is stored in the `game_screenshots` folder. 
 Here's a video containing gameplay: https://video.vu.nl/media/Minesweeper+OOFP+2022+Bonus+-+Anca+Strulea/1_0ugl21l6
