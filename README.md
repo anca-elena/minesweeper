@@ -20,7 +20,7 @@ the same, clicking it will auto-reveal all the un-flagged tiles (and possibly ma
 ### Basic functionality:
 
 When running the game you will encounter a 19 by 20 grid with a tile marked with an X.
-You're free to start with any tile, but the tile marked with X is guaranteed to result in the biggest cleared area.
+You're free to start with any tile, but the tile marked with X is guaranteed to result in a cleared area.
 The top left corner shows the number of bombs you have left (can go into the negatives if you place
 more flags than there are bombs!).
 The top right corner shows how much time you've spent on a game (up to 999 seconds).
