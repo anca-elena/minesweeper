@@ -2,7 +2,7 @@ package engine
 
 import minesweeper.logic._
 
-case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]], gameOver: Boolean){
+case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Int)]], gameOver: Boolean){
 
   val IS_COVERED = true
   val HAS_FLAG = true
@@ -10,7 +10,7 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Boolea
   val WIDTH = 19
   val HEIGHT = 20
 
-  def discoverTile(x: Int, y: Int, board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]], pressedNumber : Boolean) : GameState = {
+  def discoverTile(x: Int, y: Int, board: Array[Array[(TileType, Boolean, Boolean, Int)]], pressedNumber : Boolean) : GameState = {
     if(withinBounds(x, y)) {
       val newBoard = board
       val tileType = board(x)(y)._1
@@ -69,8 +69,8 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Boolea
     GameState(newBoard, gameOver = false)
   }
 
-  private def revealAllBombs(board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]])
-                             : Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]] = {
+  private def revealAllBombs(board: Array[Array[(TileType, Boolean, Boolean, Int)]])
+                             : Array[Array[(TileType, Boolean, Boolean, Int)]] = {
     board.indices.map{ x=>
       board(0).indices.map{ y =>
         val tileType = board(x)(y)._1
@@ -91,7 +91,7 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Boolea
     }
   }
 
-  private def allBombsHaveFlags(x: Int, y: Int, board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]]): Boolean = {
+  private def allBombsHaveFlags(x: Int, y: Int, board: Array[Array[(TileType, Boolean, Boolean, Int)]]): Boolean = {
     (-1 to 1).flatMap(dx => (-1 to 1).map(dy => (x + dx, y + dy))).forall {
       case (neighborX, neighborY) =>
         !withinBounds(neighborX, neighborY) || board(neighborX)(neighborY)._1 != Bomb || hasFlag(neighborX, neighborY)
