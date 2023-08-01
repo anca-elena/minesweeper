@@ -26,6 +26,7 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Boolea
             }
           }
           else {
+            println("Not all bombs were flagged (??)")
             return GameState(revealAllBombs(newBoard), gameOver = true)
           }
         }
@@ -33,6 +34,7 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Boolea
 
       else if (isCovered(x, y) && !hasFlag(x, y)) {
         if (tileType == Bomb) {
+          println("Discovered tile was a bomb")
           newBoard(x)(y) = (RedBomb, !IS_COVERED, !HAS_FLAG, !IS_START, bombCount)
           return GameState(revealAllBombs(newBoard), gameOver = true)
         }
@@ -57,20 +59,14 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Boolea
   }
 
   def flagTile(x: Int, y: Int) : GameState = {
-    if(withinBounds(x, y) && isCovered(x, y) && !isStart(x, y)) {
-      val newBoard = gameBoard
-      val tileType = gameBoard(x)(y)._1
-      val bombCount = gameBoard(x)(y)._5
-      if (hasFlag(x, y)) {
-        newBoard(x)(y) = (tileType, IS_COVERED, !HAS_FLAG, !IS_START, bombCount)
-      }
-      else {
-        newBoard(x)(y) = (tileType, IS_COVERED, HAS_FLAG, !IS_START, bombCount)
-      }
-      return GameState(newBoard, gameOver = false)
-    }
+    val newBoard = gameBoard
+    val tileType = gameBoard(x)(y)._1
+    val bombCount = gameBoard(x)(y)._5
 
-    GameState(gameBoard, gameOver = false)
+    if(withinBounds(x, y) && isCovered(x, y) && !isStart(x, y))
+      newBoard(x)(y) = (tileType, IS_COVERED, !hasFlag(x, y), !IS_START, bombCount)
+
+    GameState(newBoard, gameOver = false)
   }
 
   private def revealAllBombs(board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]])
@@ -89,20 +85,16 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Boolea
   }
 
   private def countFlags(x: Int, y: Int) : Int = {
-    (-1 to 1).flatMap(dx =>
-      (-1 to 1).map(dy =>
-        (x + dx, y + dy))).count {
+    (-1 to 1).flatMap(dx => (-1 to 1).map(dy => (x + dx, y + dy))).count {
       case (neighborX, neighborY) =>
         withinBounds(neighborX, neighborY) && hasFlag(neighborX, neighborY)
     }
   }
 
   private def allBombsHaveFlags(x: Int, y: Int, board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]]): Boolean = {
-    (-1 to 1).flatMap(dx =>
-      (-1 to 1).map(dy =>
-        (x + dx, y + dy))).forall {
+    (-1 to 1).flatMap(dx => (-1 to 1).map(dy => (x + dx, y + dy))).forall {
       case (neighborX, neighborY) =>
-        withinBounds(neighborX, neighborY) && (board(neighborX)(neighborY)._1 != Bomb || hasFlag(neighborX, neighborY))
+        !withinBounds(neighborX, neighborY) || board(neighborX)(neighborY)._1 != Bomb || hasFlag(neighborX, neighborY)
     }
   }
 

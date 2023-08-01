@@ -14,9 +14,7 @@ class MineSweeperLogic(val gridDims: Dimensions,
 
     def gameWon : Boolean = {
       val countDiscovered = gameState.gameBoard.flatten.count(tile => !tileIsCovered(tile))
-
-      if(countDiscovered == WIDTH * HEIGHT - NUM_BOMBS) true
-      else false
+      countDiscovered == WIDTH * HEIGHT - NUM_BOMBS
     }
 
     def gameOver : Boolean = {
@@ -78,7 +76,7 @@ object MineSweeperLogic {
   val HAS_FLAG = true
   val IS_START = true
   val INIT_COUNT = 0
-  val DefaultWidth: Int = 20
+  val DefaultWidth: Int = 19
   val NrTopInvisibleLines: Int = 4
   val DefaultVisibleHeight: Int = 20
   val DefaultHeight: Int = DefaultVisibleHeight + NrTopInvisibleLines
@@ -91,27 +89,19 @@ object MineSweeperLogic {
   }
 
   //TODO: add bombs after the player clicked a tile, so that they never click on a bomb first try
-  def addBombs(board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]], gridDims: Dimensions)
+  def addBombs(board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]])
                : Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]] = {
 
     val newBoard = board
-    //TODO: refactor this to have randomX and randomY be a list of random distinct integers within the bounds
-    var randomX = Random.nextInt(gridDims.width - 1)
-    var randomY = Random.nextInt(gridDims.width)
-    for (i <- 0 until NUM_BOMBS + 1) {
-      while (newBoard(randomX)(randomY)._1 == Bomb) {
-        randomX = Random.nextInt(gridDims.width - 1)
-        randomY = Random.nextInt(gridDims.width)
-      }
-      if (i != NUM_BOMBS) {
-        newBoard(randomX)(randomY) = (Bomb, IS_COVERED, !HAS_FLAG, !IS_START, INIT_COUNT)
-      }
-    }
+    val bombCoordinates = Random.shuffle(for {x <- 0 until DefaultWidth - 1;
+                                              y <- 0 until DefaultVisibleHeight}
+                                              yield (x, y)).filter(_ != (0, 0))
 
-    newBoard(randomX)(randomY) = (DiscoveredTile, IS_COVERED, !HAS_FLAG, IS_START, INIT_COUNT)
+    for (i <- 0 until NUM_BOMBS) {
+      newBoard(bombCoordinates(i)._1)(bombCoordinates(i)._2) = (Bomb, IS_COVERED, !HAS_FLAG, !IS_START, INIT_COUNT)
+    }
     newBoard
   }
-
   def initNumberTiles(board: Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]])
                       : Array[Array[(TileType, Boolean, Boolean, Boolean, Int)]] = {
 
@@ -133,7 +123,7 @@ object MineSweeperLogic {
 
   def createBoard(gridDims: Dimensions) : GameState = {
     var board = initBoard(gridDims)
-    board = addBombs(board, gridDims)
+    board = addBombs(board)
     board = initNumberTiles(board)
 
     GameState(board, gameOver = false)

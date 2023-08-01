@@ -83,7 +83,6 @@ class MineSweeperGame extends GameBase {
   }
 
   def drawGrid(): Unit = {
-    // Only run setup once at the beginning of the game
     if(!setupDone) {
       setup()
       background(backgroundImage)
