@@ -1,0 +1,29 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="gamebase-minesweeper:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/gamebase_minesweeper_jar</output-path>
+    <root id="archive" name="gamebase-minesweeper.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="gamebase-minesweeper.main" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jogl-all-natives-linux-armv6hf.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/core.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gluegen-rt-natives-linux-i586.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jogl-all-natives-linux-amd64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jogl-all-natives-macosx-universal.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jogl-all-natives-linux-i586.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gluegen-rt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gluegen-rt-natives-linux-amd64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gluegen-rt-natives-macosx-universal.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jogl-all-natives-linux-aarch64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-library/2.13.3/1431ec9962701faf77bbd5e1449ded674be6fe5b/scala-library-2.13.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jogl-all-natives-windows-i586.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gluegen-rt-natives-windows-i586.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jogl-all-natives-windows-amd64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gluegen-rt-natives-linux-aarch64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jogl-all.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gluegen-rt-natives-windows-amd64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gluegen-rt-natives-linux-armv6hf.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

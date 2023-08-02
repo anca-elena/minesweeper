@@ -2,22 +2,20 @@ package engine
 
 import minesweeper.logic._
 
-case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Int)]], gameOver: Boolean){
+case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean){
 
   val IS_COVERED = true
   val HAS_FLAG = true
-  val IS_START = true
-  val WIDTH = 19
-  val HEIGHT = 20
+  val WIDTH: Int = MineSweeperLogic.DefaultWidth
+  val HEIGHT: Int = MineSweeperLogic.DefaultVisibleHeight
 
-  def discoverTile(x: Int, y: Int, board: Array[Array[(TileType, Boolean, Boolean, Int)]], pressedNumber : Boolean) : GameState = {
+  def discoverTile(x: Int, y: Int, board: Array[Array[Tile]], pressedNumber : Boolean) : GameState = {
     if(withinBounds(x, y)) {
       val newBoard = board
-      val tileType = board(x)(y)._1
-      val bombCount = board(x)(y)._5
-
-      if(tileType == NumberTile && pressedNumber) {
-        if(countFlags(x, y) == bombCount) {
+      val tile = newBoard(x)(y)
+      
+      if(tile._tileType == NumberTile && pressedNumber) {
+        if(countFlags(x, y) == tile._bombCount) {
           if (allBombsHaveFlags(x, y, board)) {
             for (i <- -1 to 1; j <- -1 to 1) {
               if (withinBounds(x + i, y + j) && (i != 0 || j != 0)) {
@@ -32,20 +30,20 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Int)]]
         }
       }
 
-      else if (isCovered(x, y) && !hasFlag(x, y)) {
-        if (tileType == Bomb) {
+      else if (tile._isCovered && !tile._hasFlag) {
+        if (tile._tileType == Bomb) {
           println("Discovered tile was a bomb")
-          newBoard(x)(y) = (RedBomb, !IS_COVERED, !HAS_FLAG, !IS_START, bombCount)
+          newBoard(x)(y) = new Tile(RedBomb, tile._bombCount, !IS_COVERED, !HAS_FLAG)
           return GameState(revealAllBombs(newBoard), gameOver = true)
         }
         else {
-          newBoard(x)(y) = (tileType, !IS_COVERED, !HAS_FLAG, !IS_START, bombCount)
+          newBoard(x)(y) = new Tile(tile._tileType, tile._bombCount, !IS_COVERED, !HAS_FLAG)
 
-          if (bombCount == 0) {
+          if (tile._bombCount == 0) {
             for (i <- -1 to 1; j <- -1 to 1) {
               if (withinBounds(x + i, y + j) && (j != 0 || i != 0)) {
-                val newTile = newBoard(x + i)(y + j)._1
-                if(isCovered(x + i, y + j) && !hasFlag(x + i, y + j) && newTile != Bomb) {
+                val newTile = newBoard(x + i)(y + j)
+                if(newTile._isCovered && !newTile._hasFlag && newTile._tileType != Bomb) {
                   discoverTile(x + i, y + j, newBoard, pressedNumber = false)
                 }
               }
@@ -60,26 +58,25 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Int)]]
 
   def flagTile(x: Int, y: Int) : GameState = {
     val newBoard = gameBoard
-    val tileType = gameBoard(x)(y)._1
-    val bombCount = gameBoard(x)(y)._5
+    val tile = gameBoard(x)(y)
 
-    if(withinBounds(x, y) && isCovered(x, y) && !isStart(x, y))
-      newBoard(x)(y) = (tileType, IS_COVERED, !hasFlag(x, y), !IS_START, bombCount)
+    if(withinBounds(x, y) && tile._isCovered)
+      newBoard(x)(y) = new Tile(tile._tileType, tile._bombCount, IS_COVERED, !tile._hasFlag)
 
     GameState(newBoard, gameOver = false)
   }
 
-  private def revealAllBombs(board: Array[Array[(TileType, Boolean, Boolean, Int)]])
-                             : Array[Array[(TileType, Boolean, Boolean, Int)]] = {
+  private def revealAllBombs(board: Array[Array[Tile]])
+                             : Array[Array[Tile]] = {
     board.indices.map{ x=>
       board(0).indices.map{ y =>
-        val tileType = board(x)(y)._1
-        if (tileType == Bomb && !hasFlag(x, y))
-          (Bomb, !IS_COVERED, !HAS_FLAG, !IS_START, 0)
-        else if(tileType != Bomb && hasFlag(x, y))
-          (WrongFlag, !IS_COVERED, !HAS_FLAG, !IS_START, 0)
+        val tile = board(x)(y)
+        if (tile._tileType == Bomb && !tile._hasFlag)
+          new Tile(Bomb, 0, !IS_COVERED, !HAS_FLAG)
+        else if(tile._tileType != Bomb && tile._hasFlag)
+          new Tile(WrongFlag, 0, !IS_COVERED, !HAS_FLAG)
         else
-          board(x)(y)
+          tile
       }.toArray
     }.toArray
   }
@@ -87,30 +84,20 @@ case class GameState(gameBoard : Array[Array[(TileType, Boolean, Boolean, Int)]]
   private def countFlags(x: Int, y: Int) : Int = {
     (-1 to 1).flatMap(dx => (-1 to 1).map(dy => (x + dx, y + dy))).count {
       case (neighborX, neighborY) =>
-        withinBounds(neighborX, neighborY) && hasFlag(neighborX, neighborY)
+        withinBounds(neighborX, neighborY) && gameBoard(neighborX)(neighborY)._hasFlag
     }
   }
 
-  private def allBombsHaveFlags(x: Int, y: Int, board: Array[Array[(TileType, Boolean, Boolean, Int)]]): Boolean = {
+  private def allBombsHaveFlags(x: Int, y: Int, board: Array[Array[Tile]]): Boolean = {
     (-1 to 1).flatMap(dx => (-1 to 1).map(dy => (x + dx, y + dy))).forall {
       case (neighborX, neighborY) =>
-        !withinBounds(neighborX, neighborY) || board(neighborX)(neighborY)._1 != Bomb || hasFlag(neighborX, neighborY)
+          !withinBounds(neighborX, neighborY) ||
+          board(neighborX)(neighborY)._tileType != Bomb ||
+          board(neighborX)(neighborY)._hasFlag
     }
-  }
-
-  private def isCovered(x: Int, y: Int) : Boolean = {
-    gameBoard(x)(y)._2
-  }
-
-  private def hasFlag(x: Int, y: Int) : Boolean = {
-    gameBoard(x)(y)._3
-  }
-
-  private def isStart(x: Int, y: Int) : Boolean = {
-    gameBoard(x)(y)._4
   }
 
   private def withinBounds(x: Int, y: Int) : Boolean = {
-    x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT
+    x >= 0 && y >= 0 && x < WIDTH - 1 && y < HEIGHT
   }
 }

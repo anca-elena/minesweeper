@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MineSweeper" type="Application" factoryName="Application">
+    <option name="ALTERNATIVE_JRE_PATH" value="/usr/lib/jvm/java-1.11.0-openjdk-amd64" />
+    <option name="MAIN_CLASS_NAME" value="minesweeper.game.MineSweeperGame" />
+    <module name="gamebase-minesweeper.main" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

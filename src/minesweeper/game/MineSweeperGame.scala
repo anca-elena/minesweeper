@@ -4,7 +4,7 @@ import engine.GameBase
 import engine.graphics.{Point, Rectangle}
 import minesweeper.game.MineSweeperGame.{HeightCellInPixels, WidthCellInPixels}
 import minesweeper.logic._
-import processing.core.{PApplet, PImage}
+import processing.core.{PApplet, PConstants, PImage}
 
 class MineSweeperGame extends GameBase {
 
@@ -118,7 +118,7 @@ class MineSweeperGame extends GameBase {
       }
     }
     else if(mouseButton == RIGHT) {
-      gameLogic.flag(tileX, tileY)
+      gameLogic.flagTile(tileX, tileY)
     }
     redraw()
   }
@@ -177,10 +177,9 @@ class MineSweeperGame extends GameBase {
         case Bomb => image(tiles(2), pixelRow, pixelCol)
         case RedBomb => image(tiles(3), pixelRow, pixelCol)
         case Flag => image(tiles(4), pixelRow, pixelCol)
-        case StartHere => image(tiles(5), pixelRow, pixelCol)
         case WrongFlag => image(tiles(6), pixelRow, pixelCol)
         case NumberTile =>
-          val number = gameLogic.gameState.gameBoard(i)(j - MineSweeperLogic.NrTopInvisibleLines + 1)._5 - 1
+          val number = gameLogic.gameState.gameBoard(i)(j - MineSweeperLogic.NrTopInvisibleLines + 1)._bombCount - 1
           image(numbers(number), pixelRow, pixelCol)
       }
     }
@@ -207,7 +206,7 @@ class MineSweeperGame extends GameBase {
   private def countBombsLeft() : Int = {
     var countFlagged = 0
     for (i <- gameLogic.gameState.gameBoard.indices; j <- gameLogic.gameState.gameBoard.indices) {
-      if (gameLogic.gameState.gameBoard(i)(j)._3) {
+      if (gameLogic.gameState.gameBoard(i)(j)._hasFlag) {
         countFlagged += 1
       }
     }
