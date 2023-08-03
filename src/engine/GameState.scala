@@ -6,7 +6,7 @@ case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean){
 
   val IS_COVERED = true
   val HAS_FLAG = true
-  val WIDTH: Int = MineSweeperLogic.DefaultWidth
+  val WIDTH: Int = MineSweeperLogic.DefaultWidth - 1
   val HEIGHT: Int = MineSweeperLogic.DefaultVisibleHeight
 
   def discoverTile(x: Int, y: Int, board: Array[Array[Tile]], pressedNumber : Boolean) : GameState = {
@@ -98,6 +98,6 @@ case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean){
   }
 
   private def withinBounds(x: Int, y: Int) : Boolean = {
-    x >= 0 && y >= 0 && x < WIDTH - 1 && y < HEIGHT
+    x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT
   }
 }

@@ -7,13 +7,13 @@ import scala.util.Random
 class MineSweeperLogic(val gridDims: Dimensions, val initialState: GameState) {
 
   var gameState: GameState = initialState
-  val WIDTH: Int = MineSweeperLogic.DefaultWidth - 1
+  val WIDTH: Int = MineSweeperLogic.DefaultWidth
   val HEIGHT: Int = MineSweeperLogic.DefaultWidth
   val NUM_BOMBS: Int = MineSweeperLogic.NUM_BOMBS
 
   def gameWon : Boolean = {
-    val countDiscovered = gameState.gameBoard.flatten.count(tile => tile._isCovered)
-    countDiscovered == WIDTH * HEIGHT - NUM_BOMBS
+    val countDiscovered = gameState.gameBoard.flatten.count(tile => !tile._isCovered)
+    countDiscovered == WIDTH * HEIGHT - NUM_BOMBS - 1
   }
 
   def gameOver : Boolean = {
@@ -74,7 +74,7 @@ object MineSweeperLogic {
                : Array[Array[Tile]] = {
 
     val newBoard = board
-    val bombCoordinates = Random.shuffle(for {x <- 0 until DefaultWidth
+    val bombCoordinates = Random.shuffle(for {x <- 0 until DefaultWidth - 1
                                               y <- 0 until DefaultVisibleHeight}
                                               yield (x, y)).filter(_ != (0, 0))
 
@@ -113,7 +113,7 @@ object MineSweeperLogic {
 
   private def countBombs(x: Int, y: Int, board: Array[Array[Tile]]): Int = {
     def withinBounds(x: Int, y: Int): Boolean = {
-      x >= 0 && y >= 0 && x < DefaultWidth - 1 && y < DefaultVisibleHeight
+      x >= 0 && y >= 0 && x < DefaultWidth && y < DefaultVisibleHeight
     }
 
     (-1 to 1).flatMap(dx =>
