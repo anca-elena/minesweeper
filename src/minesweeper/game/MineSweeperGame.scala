@@ -48,14 +48,10 @@ class MineSweeperGame extends GameBase {
     "src/engine/graphics/sprites/loser.png",
     "src/engine/graphics/sprites/winner.png")
 
-  // 20 x 20 background
-//  var backgroundImage: PImage = createImage(0, 0, 0)
-
   override def draw(): Unit = {
     drawGrid()
   }
 
-  // Load all images + font for bomb count and timer
   override def setup(): Unit = {
     for(i <- tiles.indices) {
       tiles(i) = loadImage(tilePaths(i))
@@ -92,6 +88,7 @@ class MineSweeperGame extends GameBase {
     size(pxWidth, pxHeight)
   }
 
+  // TODO: make it so the timer only starts after a tile has been clicked
   override def mouseClicked() : Unit = {
     val LEFT = 37
     val RIGHT = 39
@@ -115,7 +112,7 @@ class MineSweeperGame extends GameBase {
   }
 
   private def updateTimer(): Unit = {
-    if (millis() - timer >= 1000 && !gameLogic.gameWon && !gameLogic.gameState.gameOver) {
+    if (millis() - timer >= 1000 && !gameLogic.gameWon && !gameLogic.gameOver) {
       if (secondsElapsed < 999) {
         secondsElapsed += 1
       }
@@ -146,7 +143,7 @@ class MineSweeperGame extends GameBase {
 
   private def drawSmiley(): Unit = {
     val index = gameLogic match {
-      case state if state.gameState.gameOver => 1
+      case state if state.gameOver => 1
       case state if state.gameWon => 2
       case _ => 0
     }
