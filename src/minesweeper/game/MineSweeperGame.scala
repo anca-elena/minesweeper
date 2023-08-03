@@ -12,27 +12,26 @@ class MineSweeperGame extends GameBase {
 
   var gameLogic: MineSweeperLogic = MineSweeperLogic()
   val gridDims: Dimensions = gameLogic.gridDims
-  val widthInPixels: Int = (WidthCellInPixels * gridDims.width).ceil.toInt
-  val heightInPixels: Int = (HeightCellInPixels * gridDims.height).ceil.toInt
-  val widthPerCell: Float = (widthInPixels / gridDims.width).toFloat
+  val pxWidth: Int = (WidthCellInPixels * gridDims.width).ceil.toInt
+  val pxHeight: Int = (HeightCellInPixels * gridDims.height).ceil.toInt
+  val cellWidth: Float = (pxWidth / gridDims.width).toFloat
 
   var timer : Int = millis()
   var secondsElapsed: Int = 0
 
   // Basic tiles
-  var tiles : Array[PImage] = new Array[PImage](7)
-  var tilePaths: Array[String] = Array(
+  val tiles : Array[PImage] = new Array[PImage](6)
+  val tilePaths: Array[String] = Array(
     "src/engine/graphics/sprites/coveredTile.png",
     "src/engine/graphics/sprites/discoveredTile.png",
     "src/engine/graphics/sprites/bomb.png",
     "src/engine/graphics/sprites/redBomb.png",
     "src/engine/graphics/sprites/flag.png",
-    "src/engine/graphics/sprites/startHere.png",
     "src/engine/graphics/sprites/wrongFlag.png")
 
   // Number tiles
-  var numbers : Array[PImage] = new Array[PImage](8)
-  var numberPaths : List[String] = List(
+  val numbers : Array[PImage] = new Array[PImage](8)
+  val numberPaths : List[String] = List(
     "src/engine/graphics/sprites/one.png",
     "src/engine/graphics/sprites/two.png",
     "src/engine/graphics/sprites/three.png",
@@ -43,16 +42,14 @@ class MineSweeperGame extends GameBase {
     "src/engine/graphics/sprites/eight.png")
 
   // Smileys
-  var smileys : Array[PImage] = new Array[PImage](3)
-  var smileyPaths : List[String] = List(
+  val smileys : Array[PImage] = new Array[PImage](3)
+  val smileyPaths : List[String] = List(
     "src/engine/graphics/sprites/start.png",
     "src/engine/graphics/sprites/loser.png",
     "src/engine/graphics/sprites/winner.png")
 
   // 20 x 20 background
-  var backgroundImage: PImage = createImage(0, 0, 0)
-
-  var setupDone = false
+//  var backgroundImage: PImage = createImage(0, 0, 0)
 
   override def draw(): Unit = {
     drawGrid()
@@ -62,33 +59,28 @@ class MineSweeperGame extends GameBase {
   override def setup(): Unit = {
     for(i <- tiles.indices) {
       tiles(i) = loadImage(tilePaths(i))
-      tiles(i).resize(widthPerCell.toInt, widthPerCell.toInt)
+      tiles(i).resize(cellWidth.toInt, cellWidth.toInt)
     }
 
     for(i <- numbers.indices) {
       numbers(i) = loadImage(numberPaths(i))
-      numbers(i).resize(widthPerCell.toInt, widthPerCell.toInt)
+      numbers(i).resize(cellWidth.toInt, cellWidth.toInt)
     }
 
     for(i <- smileys.indices) {
       smileys(i) = loadImage(smileyPaths(i))
-      smileys(i).resize((widthPerCell * 2).toInt, (widthPerCell * 2).toInt)
+      smileys(i).resize((cellWidth * 2).toInt, (cellWidth * 2).toInt)
     }
 
-    backgroundImage = loadImage("src/engine/graphics/sprites/20x20background.png")
-    backgroundImage.resize(widthInPixels, heightInPixels)
+    val backgroundImage = loadImage("src/engine/graphics/sprites/20x20background.png")
+    backgroundImage.resize(pxWidth, pxHeight)
 
     val font = createFont("src/engine/graphics/sprites/ConnectionIii-Rj3W.otf", 45)
     textFont(font)
+    background(backgroundImage)
   }
 
   def drawGrid(): Unit = {
-    if(!setupDone) {
-      setup()
-      background(backgroundImage)
-      setupDone = true
-    }
-
     updateTimer()
     drawBombCountAndTime()
     drawSmiley()
@@ -97,8 +89,7 @@ class MineSweeperGame extends GameBase {
 
   override def settings(): Unit = {
     pixelDensity(displayDensity())
-    // If line below gives errors try size(widthInPixels, heightInPixels, PConstants.P2D)
-    size(widthInPixels, heightInPixels)
+    size(pxWidth, pxHeight)
   }
 
   override def mouseClicked() : Unit = {
@@ -134,12 +125,12 @@ class MineSweeperGame extends GameBase {
 
   private def drawBombCountAndTime(): Unit = {
     val leftBlackScreenX = 2 + GRID_BUFFER.toFloat
-    val rightBlackScreenX = widthInPixels - 7 * (GRID_BUFFER.toFloat + 1)
+    val rightBlackScreenX = pxWidth - 7 * (GRID_BUFFER.toFloat + 1)
     val blackScreenY = 2 + GRID_BUFFER.toFloat
     val blackScreenHeight = (MineSweeperLogic.NrTopInvisibleLines - 1) * GRID_BUFFER.toFloat
     val blackScreenWidth = blackScreenHeight * 2
     val bombCountX = (1.5 * GRID_BUFFER).toFloat
-    val secondsX = widthInPixels - 7 * GRID_BUFFER.toFloat
+    val secondsX = pxWidth - 7 * GRID_BUFFER.toFloat
     val textY = 10 + ((MineSweeperLogic.NrTopInvisibleLines - 1) * GRID_BUFFER).toFloat
 
     fill(0)
@@ -160,7 +151,7 @@ class MineSweeperGame extends GameBase {
       case _ => 0
     }
 
-    image(smileys(index), (widthInPixels / 2 - GRID_BUFFER).toFloat, GRID_BUFFER.toFloat)
+    image(smileys(index), (pxWidth / 2 - GRID_BUFFER).toFloat, GRID_BUFFER.toFloat)
   }
 
   private def drawTiles(): Unit = {
@@ -177,7 +168,7 @@ class MineSweeperGame extends GameBase {
         case Bomb => image(tiles(2), pixelRow, pixelCol)
         case RedBomb => image(tiles(3), pixelRow, pixelCol)
         case Flag => image(tiles(4), pixelRow, pixelCol)
-        case WrongFlag => image(tiles(6), pixelRow, pixelCol)
+        case WrongFlag => image(tiles(5), pixelRow, pixelCol)
         case NumberTile =>
           val number = gameLogic.gameState.gameBoard(i)(j - MineSweeperLogic.NrTopInvisibleLines + 1)._bombCount - 1
           image(numbers(number), pixelRow, pixelCol)
@@ -187,19 +178,19 @@ class MineSweeperGame extends GameBase {
 
   // Convert pixel coordinates to Tile coordinates and vice-versa
   private def getTileX(x: Int): Int = {
-    ((x - GRID_BUFFER) / widthPerCell).toInt
+    ((x - GRID_BUFFER) / cellWidth).toInt
   }
 
   private def getTileY(y: Int): Int = {
-    ((y - GRID_BUFFER) / widthPerCell - MineSweeperLogic.NrTopInvisibleLines + 1).toInt
+    ((y - GRID_BUFFER) / cellWidth - MineSweeperLogic.NrTopInvisibleLines + 1).toInt
   }
 
   private def getPixelCoord(coord: Int): Int = {
-    (coord * widthPerCell + GRID_BUFFER).toInt
+    (coord * cellWidth + GRID_BUFFER).toInt
   }
 
   private def mouseOverSmiley(mouseX: Int, mouseY: Int): Boolean = {
-    mouseX >= widthInPixels / 2 - GRID_BUFFER && mouseX <= widthInPixels / 2 + GRID_BUFFER * 2 &&
+    mouseX >= pxWidth / 2 - GRID_BUFFER && mouseX <= pxWidth / 2 + GRID_BUFFER * 2 &&
       mouseY >= GRID_BUFFER && mouseY <= GRID_BUFFER * 3
   }
 
@@ -221,5 +212,6 @@ object MineSweeperGame extends GameBase {
 
   def main(args: Array[String]): Unit = {
     PApplet.main("minesweeper.game.MineSweeperGame")
+
   }
 }
