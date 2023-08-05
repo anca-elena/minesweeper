@@ -3,11 +3,9 @@
 ### How to run the game:
 
 First, you're going to need to have IntelliJ installed along with the Scala plugin and JDK 11. Open the project in IntelliJ and: 
-- Simply select the "MineSweeper" configuration in the top-right drop-down menu and click run.
+- Select the "MineSweeper" configuration in the top-right drop-down menu and click run.
 - If it doesn't work, try going into Edit Configurations and changing the Java version of "MineSweeper" to the first option.
 - If that doesn't work either, navigate to src > minesweeper > game > MineSweeperGame and choose "Current File" from the menu.
-
-If neither of those options work just let me know and I will ~~probably cry~~ try to figure it out!
 
 ### How to interact with the game:
 
