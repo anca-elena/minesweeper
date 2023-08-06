@@ -44,9 +44,9 @@ class MineSweeperGame extends GameBase {
   // Smileys
   val smileys : Array[PImage] = new Array[PImage](3)
   val smileyPaths : List[String] = List(
-    "src/engine/graphics/sprites/start.png",
     "src/engine/graphics/sprites/loser.png",
-    "src/engine/graphics/sprites/winner.png")
+    "src/engine/graphics/sprites/winner.png",
+    "src/engine/graphics/sprites/start.png")
 
   override def draw(): Unit = {
     drawGrid()
@@ -78,7 +78,7 @@ class MineSweeperGame extends GameBase {
 
   def drawGrid(): Unit = {
     updateTimer()
-    drawBombCountAndTime()
+    drawBlackScreens()
     drawSmiley()
     drawTiles()
   }
@@ -119,32 +119,32 @@ class MineSweeperGame extends GameBase {
     }
   }
 
-  private def drawBombCountAndTime(): Unit = {
-    val leftBlackScreenX = 2 + GRID_BUFFER.toFloat
-    val rightBlackScreenX = pxWidth - 7 * (GRID_BUFFER.toFloat + 1)
-    val blackScreenY = 2 + GRID_BUFFER.toFloat
-    val blackScreenHeight = (MineSweeperLogic.NrTopInvisibleLines - 1) * GRID_BUFFER.toFloat
-    val blackScreenWidth = blackScreenHeight * 2
-    val bombCountX = (1.5 * GRID_BUFFER).toFloat
-    val secondsX = pxWidth - 7 * GRID_BUFFER.toFloat
+  private def drawBlackScreens(): Unit = {
+    val leftScreenX = 2 + GRID_BUFFER.toFloat
+    val rightScreenX = pxWidth - 7 * (GRID_BUFFER.toFloat + 1)
+    val screenY = 2 + GRID_BUFFER.toFloat
+
+    val height = (MineSweeperLogic.NrTopInvisibleLines - 1) * GRID_BUFFER.toFloat
+    val width = height * 2
+
+    val countX = (1.5 * GRID_BUFFER).toFloat
+    val timeX = pxWidth - 7 * GRID_BUFFER.toFloat
     val textY = 10 + ((MineSweeperLogic.NrTopInvisibleLines - 1) * GRID_BUFFER).toFloat
 
     fill(0)
-    var blackScreen = Rectangle(Point(leftBlackScreenX, blackScreenY), blackScreenWidth, blackScreenHeight)
-    drawRectangle(blackScreen)
-    blackScreen = Rectangle(Point(rightBlackScreenX, blackScreenY), blackScreenWidth, blackScreenHeight)
-    drawRectangle(blackScreen)
+    drawRectangle(Rectangle(Point(leftScreenX,  screenY), width, height))
+    drawRectangle(Rectangle(Point(rightScreenX, screenY), width, height))
 
     fill(255, 0, 0)
-    drawText(countBombsLeft().toString, Point(bombCountX, textY), withShadow = false)
-    drawText(secondsElapsed.toString, Point(secondsX, textY), withShadow = false)
+    drawText(countBombsLeft().toString, Point(countX, textY), withShadow = false)
+    drawText(secondsElapsed.toString,   Point(timeX,  textY), withShadow = false)
   }
 
   private def drawSmiley(): Unit = {
     val index = gameLogic match {
-      case state if state.gameOver => 1
-      case state if state.gameWon => 2
-      case _ => 0
+      case state if state.gameOver => 0
+      case state if state.gameWon => 1
+      case _ => 2
     }
 
     image(smileys(index), (pxWidth / 2 - GRID_BUFFER).toFloat, GRID_BUFFER.toFloat)
