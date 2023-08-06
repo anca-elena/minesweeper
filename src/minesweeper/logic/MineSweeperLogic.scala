@@ -20,6 +20,10 @@ class MineSweeperLogic(val gridDims: Dimensions, val initialState: GameState) {
     gameState.gameOver
   }
 
+  def gameStarted : Boolean = {
+    gameState.gameStarted
+  }
+
   def getTileType(x: Int, y: Int) : TileType = {
     val tile = gameState.gameBoard(x)(y)
     if(tile._isCovered && !tile._hasFlag) {
@@ -108,7 +112,7 @@ object MineSweeperLogic {
     board = addBombs(board)
     board = initNumberTiles(board)
 
-    GameState(board, gameOver = false)
+    GameState(board, gameOver = false, gameStarted = false)
   }
 
   private def countBombs(x: Int, y: Int, board: Array[Array[Tile]]): Int = {

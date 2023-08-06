@@ -112,7 +112,7 @@ class MineSweeperGame extends GameBase {
   }
 
   private def updateTimer(): Unit = {
-    if (millis() - timer >= 1000 && !gameLogic.gameWon && !gameLogic.gameOver) {
+    if (millis() - timer >= 1000 && !gameLogic.gameWon && !gameLogic.gameOver && gameLogic.gameStarted) {
       if (secondsElapsed < 999) {
         secondsElapsed += 1
       }

@@ -2,7 +2,7 @@ package engine
 
 import minesweeper.logic._
 
-case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean){
+case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean, gameStarted: Boolean){
 
   val IS_COVERED = true
   val HAS_FLAG = true
@@ -25,7 +25,7 @@ case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean){
           }
           else {
             println("Not all bombs were flagged (??)")
-            return GameState(revealAllBombs(newBoard), gameOver = true)
+            return GameState(revealAllBombs(newBoard), gameOver = true, gameStarted = false)
           }
         }
       }
@@ -34,7 +34,7 @@ case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean){
         if (tile._tileType == Bomb) {
           println("Discovered tile was a bomb")
           newBoard(x)(y) = new Tile(RedBomb, tile._bombCount, !IS_COVERED, !HAS_FLAG)
-          return GameState(revealAllBombs(newBoard), gameOver = true)
+          return GameState(revealAllBombs(newBoard), gameOver = true, gameStarted = false)
         }
         else {
           newBoard(x)(y) = new Tile(tile._tileType, tile._bombCount, !IS_COVERED, !HAS_FLAG)
@@ -49,11 +49,11 @@ case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean){
               }
             }
           }
-          return GameState(newBoard, gameOver = false)
+          return GameState(newBoard, gameOver = false, gameStarted = true)
         }
       }
     }
-    GameState(gameBoard, gameOver = false)
+    GameState(gameBoard, gameOver = false, gameStarted = true)
   }
 
   def flagTile(x: Int, y: Int) : GameState = {
@@ -63,7 +63,7 @@ case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean){
     if(withinBounds(x, y) && tile._isCovered)
       newBoard(x)(y) = new Tile(tile._tileType, tile._bombCount, IS_COVERED, !tile._hasFlag)
 
-    GameState(newBoard, gameOver = false)
+    GameState(newBoard, gameOver = false, gameStarted = true)
   }
 
   private def revealAllBombs(board: Array[Array[Tile]])
