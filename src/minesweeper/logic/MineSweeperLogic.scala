@@ -99,7 +99,6 @@ object MineSweeperLogic {
             board(x)(y)
         }
         else {
-          // TODO: switch back to bombs being covered
           new Tile(Bomb, 0, IS_COVERED, !HAS_FLAG)
         }
       ).toArray

@@ -88,7 +88,6 @@ class MineSweeperGame extends GameBase {
     size(pxWidth, pxHeight)
   }
 
-  // TODO: make it so the timer only starts after a tile has been clicked
   override def mouseClicked() : Unit = {
     val LEFT = 37
     val RIGHT = 39
@@ -193,7 +192,7 @@ class MineSweeperGame extends GameBase {
 
   private def countBombsLeft() : Int = {
     var countFlagged = 0
-    for (i <- gameLogic.gameState.gameBoard.indices; j <- gameLogic.gameState.gameBoard.indices) {
+    for (i <- gameLogic.gameState.gameBoard.indices; j <- gameLogic.gameState.gameBoard(i).indices) {
       if (gameLogic.gameState.gameBoard(i)(j)._hasFlag) {
         countFlagged += 1
       }
