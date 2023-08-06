@@ -2,7 +2,7 @@ package engine
 
 import minesweeper.logic._
 
-case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean, gameStarted: Boolean){
+case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean){
 
   val IS_COVERED = true
   val HAS_FLAG = true
@@ -24,17 +24,15 @@ case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean, gameStar
             }
           }
           else {
-            println("Not all bombs were flagged (??)")
-            return GameState(revealAllBombs(newBoard), gameOver = true, gameStarted = false)
+            return GameState(revealAllBombs(newBoard), gameOver = true)
           }
         }
       }
 
       else if (tile._isCovered && !tile._hasFlag) {
         if (tile._tileType == Bomb) {
-          println("Discovered tile was a bomb")
           newBoard(x)(y) = new Tile(RedBomb, tile._bombCount, !IS_COVERED, !HAS_FLAG)
-          return GameState(revealAllBombs(newBoard), gameOver = true, gameStarted = false)
+          return GameState(revealAllBombs(newBoard), gameOver = true)
         }
         else {
           newBoard(x)(y) = new Tile(tile._tileType, tile._bombCount, !IS_COVERED, !HAS_FLAG)
@@ -49,11 +47,11 @@ case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean, gameStar
               }
             }
           }
-          return GameState(newBoard, gameOver = false, gameStarted = true)
+          return GameState(newBoard, gameOver = false)
         }
       }
     }
-    GameState(gameBoard, gameOver = false, gameStarted = true)
+    GameState(gameBoard, gameOver = false)
   }
 
   def flagTile(x: Int, y: Int) : GameState = {
@@ -63,7 +61,7 @@ case class GameState(gameBoard : Array[Array[Tile]], gameOver: Boolean, gameStar
     if(withinBounds(x, y) && tile._isCovered)
       newBoard(x)(y) = new Tile(tile._tileType, tile._bombCount, IS_COVERED, !tile._hasFlag)
 
-    GameState(newBoard, gameOver = false, gameStarted = true)
+    GameState(newBoard, gameOver = false)
   }
 
   private def revealAllBombs(board: Array[Array[Tile]])

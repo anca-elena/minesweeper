@@ -1,6 +1,7 @@
 package minesweeper.logic
 
 import engine.GameState
+import minesweeper.logic.MineSweeperLogic.{addBombs, initNumberTiles}
 
 import scala.util.Random
 
@@ -21,7 +22,7 @@ class MineSweeperLogic(val gridDims: Dimensions, val initialState: GameState) {
   }
 
   def gameStarted : Boolean = {
-    gameState.gameStarted
+    gameState.gameBoard.flatten.exists(tile => !tile._isCovered || tile._hasFlag)
   }
 
   def getTileType(x: Int, y: Int) : TileType = {
@@ -37,12 +38,16 @@ class MineSweeperLogic(val gridDims: Dimensions, val initialState: GameState) {
 
   def discoverTile(x: Int, y: Int) : Unit = {
     val tile = gameState.gameBoard(x)(y)
+    var newBoard = gameState.gameBoard
+    if(!gameStarted) {
+      newBoard = initNumberTiles(addBombs(gameState.gameBoard, (x, y)))
+    }
     if(!gameOver && !gameWon) {
       if(tile._tileType == NumberTile && !tile._isCovered) {
-        gameState = gameState.discoverTile(x, y, gameState.gameBoard, pressedNumber = true)
+        gameState = gameState.discoverTile(x, y, newBoard, pressedNumber = true)
       }
       else {
-        gameState = gameState.discoverTile(x, y, gameState.gameBoard, pressedNumber = false)
+        gameState = gameState.discoverTile(x, y, newBoard, pressedNumber = false)
       }
     }
   }
@@ -74,13 +79,13 @@ object MineSweeperLogic {
   }
 
   //TODO: add bombs after the player clicked a tile, so that they never click on a bomb first try
-  def addBombs(board: Array[Array[Tile]])
+  def addBombs(board: Array[Array[Tile]], start: (Int, Int))
                : Array[Array[Tile]] = {
 
     val newBoard = board
     val bombCoordinates = Random.shuffle(for {x <- 0 until DefaultWidth - 1
                                               y <- 0 until DefaultVisibleHeight}
-                                              yield (x, y)).filter(_ != (0, 0))
+                                              yield (x, y)).filter(_ != start)
 
     for (i <- 0 until NUM_BOMBS) {
       newBoard(bombCoordinates(i)._1)(bombCoordinates(i)._2) = new Tile(Bomb, INIT_COUNT, IS_COVERED, !HAS_FLAG)
@@ -108,10 +113,10 @@ object MineSweeperLogic {
 
   def createBoard(gridDims: Dimensions) : GameState = {
     var board = initBoard(gridDims)
-    board = addBombs(board)
-    board = initNumberTiles(board)
+//    board = addBombs(board, (0, 0))
+//    board = initNumberTiles(board)
 
-    GameState(board, gameOver = false, gameStarted = false)
+    GameState(board, gameOver = false)
   }
 
   private def countBombs(x: Int, y: Int, board: Array[Array[Tile]]): Int = {

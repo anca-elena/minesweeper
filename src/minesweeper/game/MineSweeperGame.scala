@@ -78,7 +78,7 @@ class MineSweeperGame extends GameBase {
 
   def drawGrid(): Unit = {
     updateTimer()
-    drawBlackScreens()
+    drawScreens()
     drawSmiley()
     drawTiles()
   }
@@ -119,7 +119,7 @@ class MineSweeperGame extends GameBase {
     }
   }
 
-  private def drawBlackScreens(): Unit = {
+  private def drawScreens(): Unit = {
     val leftScreenX = 2 + GRID_BUFFER.toFloat
     val rightScreenX = pxWidth - 7 * (GRID_BUFFER.toFloat + 1)
     val screenY = 2 + GRID_BUFFER.toFloat
